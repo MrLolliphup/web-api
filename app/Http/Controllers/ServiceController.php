@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreServiceRequest;
 use App\Http\Requests\UpdateServiceRequest;
 use App\Models\Service;
+use App\Models\ServiceType;
 use App\Models\User;
+use Illuminate\Http\Request;
 
 class ServiceController extends Controller
 {
@@ -87,16 +89,50 @@ class ServiceController extends Controller
 
 
 
-    public function getUserServices($userId)
+    public function getAuthUserServices(Request $request)
     {
-        $services = Service::where('user_id', $userId)->get();
-        
-        return response()->json($services);
-    }
-    public function getUserService (User $user, Service $service){
-        abort_unless($service->user_id === $user->id, 404);
+        $user = $request->user();
+        if (!$user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+        return $user->services()->latest()->get();
 
+
+        // $services = Service::where('user_id', $user)->get();
+        
+        // return response()->json($services);
+    }
+
+    public function getAuthUserService (User $user, Service $service){
+
+        abort_unless(
+            $service->user_id === $user->id,
+             404);
         return response()->json($service, 200);
+
+    }
+
+    public function createAuthUserService (StoreServiceRequest $request){
+
+        $price = ServiceType::where('service_type_id', $request->service_type_id)
+            ->value('price');
+
+        $name = ServiceType::where('service_type_id', $request->service_type_id)
+            ->value('name');
+
+        $description = ServiceType::where('service_type_id', $request->service_type_id)
+            ->value('description');
+
+        $request->merge([
+            'price' => $price,
+            'name' => $name,
+            'description' => $description,
+        ]);
+
+        
+
+        $post = $request->user()->services()->create($request->validated());
+        return response()->json($post, 201);
 
     }
 }

@@ -26,5 +26,5 @@ return new class extends Migration
             $table->dropColumn('service_type_id');
             $table->string('category')->nullable(false)->change();
         });
-    } 
-};
+    }  
+}; 

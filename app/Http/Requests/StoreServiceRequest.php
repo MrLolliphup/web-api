@@ -11,7 +11,7 @@ class StoreServiceRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return $this->user() !== null;
     }
 
     /**
@@ -26,7 +26,8 @@ class StoreServiceRequest extends FormRequest
             'service_type_id' => ['required', 'integer', 'exists:service_types,id'],
             'price' => ['required', 'numeric'],
             'description' => ['nullable', 'string'],
-            'status' => ['required', 'boolean'],
+            'status' => ['nullaBle', 'boolean' , 'default: pending'],
         ];
     }
+    
 }

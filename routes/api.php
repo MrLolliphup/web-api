@@ -19,10 +19,12 @@ Route::prefix('auth')->group(function () {
 
 
 
-//protected routes
+//protected admiin routes
 Route::middleware("auth:api")->group(function () {
     Route::get('/users', [UserController::class, 'index']);
+
     Route::get('/users/{user}', [UserController::class, 'show']);
+
     Route::post('/users', [UserController::class, 'store']);
     Route::put('/users/{user}', [UserController::class, 'update']);
     Route::delete('/users/{user}', [UserController::class, 'destroy']);
@@ -32,7 +34,6 @@ Route::middleware("auth:api")->group(function () {
     Route::post('/products', [ProductController::class, 'store']);
     Route::put('/products/{product}', [ProductController::class, 'update']);
     Route::delete('/products/{product}', [ProductController::class, 'destroy']);
-
 
     Route::apiResource('posts', PostController::class);
 
@@ -44,6 +45,22 @@ Route::middleware("auth:api")->group(function () {
     Route::apiResource('service-type-categories', ServiceTypeCategoryController::class);
     Route::apiResource('service-types', ServiceTypeController::class);
 });
+
+//user specific routes
+Route::middleware('auth:api')->group(function () {
+
+    Route::get('/user', [UserController::class, 'getAuthenticatedUser']);
+    Route::patch('/user', [UserController::class, 'updateAuthenticatedUser']);
+    Route::delete('/user', [UserController::class, 'deleteAuthenticatedUser']);
+
+    Route::get('/user/services', [ServiceController::class, 'getAuthUserServices']);
+    Route::get('/user/services/{service}', [ServiceController::class, 'getAuthUserService']);
+    Route::post('/user/services', [ServiceController::class, 'createAuthUserService']);
+    
+
+    Route::get('/logout', [UserController::class, 'logout']);
+});
+
 
 
 
